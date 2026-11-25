@@ -1,0 +1,77 @@
+
+/* General page styling */
+body {
+    font-family: Arial, sans-serif;
+    background: #f0f2f5;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* Form container */
+.container {
+    background: white;
+    width: 350px;
+    padding: 30px;
+
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Heading */
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+/* Paragraph */
+p {
+    text-align: center;
+    color: #666;
+}
+
+/* Labels */
+label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+
+/* Input fields */
+input {
+    width: 100%;
+    padding: 12px;
+    box-sizing: border-box;
+
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+/* Button */
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 20px;
+
+    background: #2563eb;
+    color: white;
+
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* Button hover */
+button:hover {
+    background: #1d4ed8;
+}
+
+/* Links */
+a {
+    color: #2563eb;
+    text-decoration: none;
+}

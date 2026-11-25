@@ -1,29 +1,23 @@
 
-from flask import Flask
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
 
 @app.route("/")
 def home():
-    return "Welcome to my website!"
+    return render_template("index.html")
 
 
-@app.route("/login")
+@app.route("/login", methods=["GET", "POST"])
 def login():
-    return "This is the login page."
+    return render_template("login.html")
 
 
-@app.route("/register")
+@app.route("/register", methods=["GET", "POST"])
 def register():
-    return "This is the registration page."
-
-@app.route("/about")
-def about():
-    return "This is my first Flask project. I am learning Python backend development."
+    return render_template("register.html")
 
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
