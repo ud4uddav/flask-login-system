@@ -155,7 +155,7 @@ def test_db():
 
         return f"Successfully connected to: {database_name[0]}"
 
-    except mysql.connector.Error as error:
+    except Error as error:
         return f"Database connection failed: {error}", 500
 
     finally:
