@@ -1,11 +1,11 @@
 
-from flask import Flask, render_template, request
-from werkzeug.security import generate_password_hash
+from flask import Flask, render_template, request, session, redirect, url_for
+from werkzeug.security import generate_password_hash, check_password_hash, os
 from mysql.connector import IntegrityError, Error
 from database import get_db_connection
 
 app = Flask(__name__)
-
+app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
 @app.route("/")
 def home():
@@ -14,6 +14,47 @@ def home():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+
+    if request.method == "POST":
+
+        email = request.form.get("email", "").strip()
+        password = request.form.get("password", "")
+
+        if not email or not password:
+            return "Email and password are required."
+
+        connection = None
+        cursor = None
+
+        try:
+            connection = get_db_connection()
+            cursor = connection.cursor(dictionary=True)
+
+            sql = "SELECT * FROM users WHERE email = %s"
+            cursor.execute(sql, (email,))
+
+            user = cursor.fetchone()
+
+            if user and check_password_hash(user["password"], password):
+
+                session["user_id"] = user["id"]
+                session["user_name"] = user["name"]
+
+                return redirect(url_for("dashboard"))
+
+            return "Invalid email or password."
+
+        except Error as error:
+            print("Database error:", error)
+            return "Something went wrong."
+
+        finally:
+            if cursor:
+                cursor.close()
+
+            if connection:
+                connection.close()
+
     return render_template("login.html")
 
 
@@ -74,6 +115,25 @@ def register():
     return render_template("register.html")
 
 
+@app.route("/dashboard")
+def dashboard():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    return render_template("dashboard.html")
+
+
+@app.route("/logout")
+def logout():
+
+    session.clear()
+
+    return redirect(url_for("login"))
+
+
+
+
 @app.route("/test-db")
 def test_db():
 
@@ -103,9 +163,12 @@ def test_db():
             cursor.close()
 
         if connection is not None and connection.is_connected():
-            connection.close()
+            connection.close()                                  
+
 
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+
 
