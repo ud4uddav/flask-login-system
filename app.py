@@ -1,7 +1,8 @@
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request
+from werkzeug.security import generate_password_hash
+from mysql.connector import IntegrityError, Error
 from database import get_db_connection
-import mysql.connector
 
 app = Flask(__name__)
 
@@ -18,6 +19,58 @@ def login():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
+
+    if request.method == "POST":
+
+        # Get data from the registration form
+        name = request.form.get("name", "").strip()
+        email = request.form.get("email", "").strip()
+        password = request.form.get("password", "")
+
+        # Basic validation
+        if not name or not email or not password:
+            return "All fields are required."
+
+        # Hash the password
+        hashed_password = generate_password_hash(password)
+
+        connection = None
+        cursor = None
+
+        try:
+            # Connect to MySQL
+            connection = get_db_connection()
+            cursor = connection.cursor()
+
+            # Insert user into database
+            sql = """
+                INSERT INTO users (name, email, password)
+                VALUES (%s, %s, %s)
+            """
+
+            values = (name, email, hashed_password)
+
+            cursor.execute(sql, values)
+
+            # Save changes
+            connection.commit()
+
+            return "Registration successful! Your account has been created."
+
+        except IntegrityError:
+            return "This email is already registered."
+
+        except Error as error:
+            print("Database error:", error)
+            return "Something went wrong while saving your account."
+
+        finally:
+            if cursor:
+                cursor.close()
+
+            if connection:
+                connection.close()
+
     return render_template("register.html")
 
 
@@ -55,3 +108,4 @@ def test_db():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
